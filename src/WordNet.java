@@ -6,7 +6,7 @@ import edu.princeton.cs.algs4.Digraph;
 import edu.princeton.cs.algs4.In;
 
 public class WordNet {
-	
+	private final SAP paths;
 	private final Map<Integer, String> _mapSynset;
 	private final Map<String, Bag<Integer>> _mapNounId;
 	
@@ -16,7 +16,8 @@ public class WordNet {
 		_mapSynset = new HashMap<>();
 		_mapNounId = new HashMap<>();
 		buildSynset(synsets);
-		buildHypernym(hypernyms, _mapSynset.size());
+		Digraph g = buildHypernym(hypernyms, _mapSynset.size());
+		paths = new SAP(g);
 	}
 	
 	private void buildSynset(String synsets) {
@@ -66,14 +67,16 @@ public class WordNet {
 
 	// distance between nounA and nounB (defined below)
 	public int distance(String nounA, String nounB) {
-		if(nounA == null || nounB == null) throw new IllegalArgumentException();
+		if(nounA == null || nounB == null || !isNoun(nounA) || !isNoun(nounB)) throw new IllegalArgumentException();
+		return paths.length(_mapNounId.get(nounA), _mapNounId.get(nounB));
 	}
 
 	// a synset (second field of synsets.txt) that is the common ancestor of
 	// nounA and nounB
 	// in a shortest ancestral path (defined below)
 	public String sap(String nounA, String nounB) {
-		if(nounA == null || nounB == null) throw new IllegalArgumentException();
+		if(nounA == null || nounB == null || !isNoun(nounA) || !isNoun(nounB)) throw new IllegalArgumentException();
+		
 	}
 
 	// do unit testing of this class
