@@ -1,3 +1,4 @@
+import edu.princeton.cs.algs4.DepthFirstDirectedPaths;
 import edu.princeton.cs.algs4.Digraph;
 import edu.princeton.cs.algs4.In;
 import edu.princeton.cs.algs4.StdIn;
@@ -5,13 +6,18 @@ import edu.princeton.cs.algs4.StdOut;
 
 public class SAP {
 	// constructor takes a digraph (not necessarily a DAG)
+	private Digraph digraph;
 	public SAP(Digraph G){
 		if(G == null) throw new IllegalArgumentException(); 
+		this.digraph= new Digraph(G);
 	}
 
    // length of shortest ancestral path between v and w; -1 if no such path
 	public int length(int v, int w){
 		if(v == null || w == null) throw new IllegalArgumentException(); 
+		DepthFirstDirectedPaths dfs = new DepthFirstDirectedPaths(G, v);
+		return dfs.pathTo(w)
+		
 	}
 
    // a common ancestor of v and w that participates in a shortest ancestral path; -1 if no such path

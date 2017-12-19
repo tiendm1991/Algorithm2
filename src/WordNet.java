@@ -9,17 +9,18 @@ public class WordNet {
 	private final SAP paths;
 	private final Map<Integer, String> _mapSynset;
 	private final Map<String, Bag<Integer>> _mapNounId;
-	
+
 	// constructor takes the name of the two input files
 	public WordNet(String synsets, String hypernyms) {
-		if(synsets == null || hypernyms == null) throw new IllegalArgumentException(); 
+		if (synsets == null || hypernyms == null)
+			throw new IllegalArgumentException();
 		_mapSynset = new HashMap<>();
 		_mapNounId = new HashMap<>();
 		buildSynset(synsets);
 		Digraph g = buildHypernym(hypernyms, _mapSynset.size());
 		paths = new SAP(g);
 	}
-	
+
 	private void buildSynset(String synsets) {
 		In file = new In(synsets);
 		while (!file.isEmpty()) {
@@ -27,18 +28,18 @@ public class WordNet {
 			String nounId = line[0];
 			int id = Integer.parseInt(nounId);
 			_mapSynset.put(id, line[1]);
-			for(String noun : line[1].split(" ")){
+			for (String noun : line[1].split(" ")) {
 				Bag<Integer> bag = _mapNounId.get(noun);
-				if(bag == null){
+				if (bag == null) {
 					bag = new Bag<>();
 					_mapNounId.put(noun, bag);
 				}
 				bag.add(id);
 			}
 		}
-		
+
 	}
-	
+
 	private Digraph buildHypernym(String hypernyms, int numSynset) {
 		In file = new In(hypernyms);
 		Digraph g = new Digraph(numSynset);
@@ -46,7 +47,7 @@ public class WordNet {
 			String[] line = file.readLine().split(",");
 			String nounId = line[0];
 			int idSynset = Integer.parseInt(nounId);
-			for(int i = 1; i < line.length; i++){
+			for (int i = 1; i < line.length; i++) {
 				int idHyper = Integer.parseInt(line[i]);
 				g.addEdge(idSynset, idHyper);
 			}
@@ -61,13 +62,15 @@ public class WordNet {
 
 	// is the word a WordNet noun?
 	public boolean isNoun(String word) {
-		if(word == null) throw new IllegalArgumentException();
+		if (word == null)
+			throw new IllegalArgumentException();
 		return _mapNounId.containsKey(word);
 	}
 
 	// distance between nounA and nounB (defined below)
 	public int distance(String nounA, String nounB) {
-		if(nounA == null || nounB == null || !isNoun(nounA) || !isNoun(nounB)) throw new IllegalArgumentException();
+		if (nounA == null || nounB == null || !isNoun(nounA) || !isNoun(nounB))
+			throw new IllegalArgumentException();
 		return paths.length(_mapNounId.get(nounA), _mapNounId.get(nounB));
 	}
 
@@ -75,8 +78,9 @@ public class WordNet {
 	// nounA and nounB
 	// in a shortest ancestral path (defined below)
 	public String sap(String nounA, String nounB) {
-		if(nounA == null || nounB == null || !isNoun(nounA) || !isNoun(nounB)) throw new IllegalArgumentException();
-		
+		if (nounA == null || nounB == null || !isNoun(nounA) || !isNoun(nounB))
+			throw new IllegalArgumentException();
+		return _mapSynset.get(paths.ancestor(_mapNounId.get(nounA), _mapNounId.get(nounB)));
 	}
 
 	// do unit testing of this class
