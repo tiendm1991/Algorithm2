@@ -1,3 +1,6 @@
+import java.util.Iterator;
+
+import edu.princeton.cs.algs4.BreadthFirstDirectedPaths;
 import edu.princeton.cs.algs4.DepthFirstDirectedPaths;
 import edu.princeton.cs.algs4.Digraph;
 import edu.princeton.cs.algs4.In;
@@ -14,10 +17,14 @@ public class SAP {
 
    // length of shortest ancestral path between v and w; -1 if no such path
 	public int length(int v, int w){
-		if(v == null || w == null) throw new IllegalArgumentException(); 
-		DepthFirstDirectedPaths dfs = new DepthFirstDirectedPaths(G, v);
-		return dfs.pathTo(w)
-		
+		BreadthFirstDirectedPaths bfs = new BreadthFirstDirectedPaths(digraph, v);
+		Iterable<Integer> path = bfs.pathTo(w);
+		int count = 0;
+		if(path == null) return 0;
+		for (Iterator<Integer> it = path.iterator(); it.hasNext();) {
+			count++;
+		}
+		return count;
 	}
 
    // a common ancestor of v and w that participates in a shortest ancestral path; -1 if no such path
