@@ -3,6 +3,7 @@ import java.util.Map;
 
 import edu.princeton.cs.algs4.Bag;
 import edu.princeton.cs.algs4.Digraph;
+import edu.princeton.cs.algs4.DirectedCycle;
 import edu.princeton.cs.algs4.In;
 
 public class WordNet {
@@ -40,7 +41,7 @@ public class WordNet {
 
 	}
 
-	private Digraph buildHypernym(String hypernyms, int numSynset) {
+	private Digraph buildHypernym(String hypernyms, int numSynset){
 		In file = new In(hypernyms);
 		Digraph g = new Digraph(numSynset);
 		while (!file.isEmpty()) {
@@ -52,7 +53,34 @@ public class WordNet {
 				g.addEdge(idSynset, idHyper);
 			}
 		}
+		checkCycle(g);
+		checkMultiRoot(g);
 		return g;
+	}
+	
+	private void checkCycle(Digraph g) {
+		if(g.V() == 0) throw new IllegalArgumentException();
+		DirectedCycle cycle = new DirectedCycle(g);
+		if(cycle.hasCycle()) throw new IllegalArgumentException();;
+	}
+	
+	private void checkMultiRoot(Digraph g){
+		if(g.V() == 0) throw new IllegalArgumentException();
+		int[] roots = new int[g.V()];
+		for(int i = 0; i < g.V(); i++){
+			roots[i] = -1;
+			roots[i] = getRoot(i,g);
+			if(i>0){
+				if(roots[i] != roots[i-1]) throw new IllegalArgumentException();;
+			}
+		}
+	}
+	private int getRoot(int v, Digraph g) {
+		if(g.outdegree(v) == 0) return v;
+		else {
+			Iterable<Integer> adj = g.adj(v);
+			return getRoot(adj.iterator().next(), g);
+		}
 	}
 
 	// returns all WordNet nouns
