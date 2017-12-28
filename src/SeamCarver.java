@@ -88,7 +88,7 @@ public class SeamCarver {
 	
 	private int[] traceSPVertical(int minIdx) {
 		Stack<Integer> path = new Stack<>();
-		Position current = edgeTo[minIdx][height()-1];
+		Position current = new Position(minIdx, height()-1);
 		do {
 			int x = current.x;
 			int y = current.y;
@@ -132,7 +132,7 @@ public class SeamCarver {
 					distTo[x][y] = distTo[x-1][y] + energies[x][y];
 					edgeTo[x][y] = new Position(x-1, y);
 				}
-				if(isValid(x-11, y+1) && distTo[x][y] > distTo[x-11][y+1] + energies[x][y]){
+				if(isValid(x-1, y+1) && distTo[x][y] > distTo[x-1][y+1] + energies[x][y]){
 					distTo[x][y] = distTo[x-1][y+1] + energies[x][y];
 					edgeTo[x][y] = new Position(x-1, y+1);
 				}
@@ -151,11 +151,11 @@ public class SeamCarver {
 	
 	private int[] traceSPHorizontal(int minIdx) {
 		Stack<Integer> path = new Stack<>();
-		Position current = edgeTo[width()-1][minIdx];
+		Position current = new Position(width()-1, minIdx);
 		do {
 			int x = current.x;
 			int y = current.y;
-			path.push(x);
+			path.push(y);
 			current = edgeTo[x][y];
 		} while (current.x > 0);
 		path.push(current.y);
@@ -188,7 +188,7 @@ public class SeamCarver {
 	}
 	
 	private boolean isValid(int x, int y) {
-		if (x < 0 || x >= width() || y < 0 || y > height()) return false;;
+		if (x < 0 || x >= width() || y < 0 || y >= height()) return false;;
 		return true;
 	}
 	
