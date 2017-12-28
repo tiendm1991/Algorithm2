@@ -1,18 +1,15 @@
 
 import java.awt.Color;
 
-import edu.princeton.cs.algs4.DijkstraSP;
-import edu.princeton.cs.algs4.EdgeWeightedDigraph;
-import edu.princeton.cs.algs4.Graph;
 import edu.princeton.cs.algs4.Picture;
+import edu.princeton.cs.algs4.Stack;
 
 public class SeamCarver {
 	private static final boolean X = true;
 	private Picture currentPic;
 	private double[][] energies;
 	private double[][] distTo;
-	private int[][] edgeTo;
-
+	private Position[][] edgeTo;
 	public SeamCarver(Picture picture) { // create a seam carver object based on
 											// the given picture
 		this.currentPic = picture;
@@ -52,23 +49,60 @@ public class SeamCarver {
 		return r * r + g * g + b * b;
 	}
 
-	public int[] findHorizontalSeam() { // sequence of indices for horizontal seam
-		
-	}
-
 	public int[] findVerticalSeam() { // sequence of indices for vertical seam
 		energies = new double[width()][height()];
 		distTo = new double[width()][height()];
-		edgeTo = new int[width()][height()];
+		edgeTo = new Position[width()][height()];
 		init();
 		for(int y = 0; y < height(); y++){
 			for(int x = 0; x < width(); x++){
-				if(y == 0) distTo[x][y] = energies[x][y];
+				if(y == 0) {
+					distTo[x][y] = energies[x][y];
+					continue;
+				}
+				if(isValid(x-1, y-1) && distTo[x][y] > distTo[x-1][y-1] + energies[x][y]){
+					distTo[x][y] = distTo[x-1][y-1] + energies[x][y];
+					edgeTo[x][y] = new Position(x-1, y);
+				}
+				if(isValid(x, y-1) && distTo[x][y] > distTo[x][y-1] + energies[x][y]){
+					distTo[x][y] = distTo[x][y-1] + energies[x][y];
+					edgeTo[x][y] = new Position(x, y);
+				}
+				if(isValid(x+1, y-1) && distTo[x][y] > distTo[x+1][y-1] + energies[x][y]){
+					distTo[x][y] = distTo[x+1][y-1] + energies[x][y];
+					edgeTo[x][y] = new Position(x+1, y);
+				}
 			}
 		}
+		double minPath = Double.POSITIVE_INFINITY;
+		int minIdx = -1;
+		for(int x = 0; x < width(); x++){
+			if(distTo[x][height()-1] < minPath){
+				minPath = distTo[x][height()-1];
+				minIdx = x;
+			}
+		}
+		return traceSPVertical(minIdx);
 	}
 	
-
+	private int[] traceSPVertical(int minIdx) {
+		Stack<Integer> path = new Stack<>();
+		Position current = edgeTo[minIdx][height()-1];
+		do {
+			int x = current.x;
+			int y = current.y;
+			path.push(x);
+			current = edgeTo[x][y];
+		} while (current.y > 0);
+		path.push(current.x);
+		int[] result = new int[height()];
+		int count = 0;
+		while (!path.isEmpty()) {
+			result[count++] = path.pop();
+		}
+		return result;
+	}
+	
 	private void init() {
 		for(int i = 0; i < height(); i++){
 			for(int j = 0; j < width(); j++){
@@ -78,25 +112,58 @@ public class SeamCarver {
 		}
 	}
 	
-	private int findMinVertex(int idx, boolean isVertical){
-		double min = Double.POSITIVE_INFINITY;
-		int minIdx = 0;
-		if(isVertical){
-			for(int x = 0; x < width(); x++){
-				if(distTo[x][idx] < min){
-					min = distTo[x][idx];
-					minIdx = x;
-				}
-			}
-		}else {
+	public int[] findHorizontalSeam() { // sequence of indices for horizontal seam
+		energies = new double[width()][height()];
+		distTo = new double[width()][height()];
+		edgeTo = new Position[width()][height()];
+		init();
+		for(int x = 0; x < width(); x++){
 			for(int y = 0; y < height(); y++){
-				if(distTo[idx][y] < min){
-					min = distTo[idx][y];
-					minIdx = y;
+				if(x == 0) {
+					distTo[x][y] = energies[x][y];
+					continue;
+				}
+				if(isValid(x-1, y-1) && distTo[x][y] > distTo[x-1][y-1] + energies[x][y]){
+					distTo[x][y] = distTo[x-1][y-1] + energies[x][y];
+					edgeTo[x][y] = new Position(x-1, y-1);
+				}
+				if(isValid(x-1, y) && distTo[x][y] > distTo[x-1][y] + energies[x][y]){
+					distTo[x][y] = distTo[x-1][y] + energies[x][y];
+					edgeTo[x][y] = new Position(x-1, y);
+				}
+				if(isValid(x-11, y+1) && distTo[x][y] > distTo[x-11][y+1] + energies[x][y]){
+					distTo[x][y] = distTo[x-1][y+1] + energies[x][y];
+					edgeTo[x][y] = new Position(x-1, y+1);
 				}
 			}
 		}
-		return minIdx;
+		double minPath = Double.POSITIVE_INFINITY;
+		int minIdx = -1;
+		for(int y = 0; y < height(); y++){
+			if(distTo[width()-1][y] < minPath){
+				minPath = distTo[width()-1][y];
+				minIdx = y;
+			}
+		}
+		return traceSPHorizontal(minIdx);
+	}
+	
+	private int[] traceSPHorizontal(int minIdx) {
+		Stack<Integer> path = new Stack<>();
+		Position current = edgeTo[width()-1][minIdx];
+		do {
+			int x = current.x;
+			int y = current.y;
+			path.push(x);
+			current = edgeTo[x][y];
+		} while (current.x > 0);
+		path.push(current.y);
+		int[] result = new int[height()];
+		int count = 0;
+		while (!path.isEmpty()) {
+			result[count++] = path.pop();
+		}
+		return result;
 	}
 	
 	public void removeHorizontalSeam(int[] seam) { // remove horizontal seam
@@ -117,5 +184,19 @@ public class SeamCarver {
 			throw new IllegalArgumentException();
 		if (y < 0 || x >= height())
 			throw new IllegalArgumentException();
+	}
+	
+	private boolean isValid(int x, int y) {
+		if (x < 0 || x >= width() || y < 0 || y > height()) return false;;
+		return true;
+	}
+	
+	private static class Position{
+		private int x;
+		private int y;
+		public Position(int x, int y) {
+			this.x = x;
+			this.y = y;
+		}
 	}
 }
