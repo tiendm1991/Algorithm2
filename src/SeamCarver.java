@@ -5,7 +5,8 @@ import edu.princeton.cs.algs4.Picture;
 import edu.princeton.cs.algs4.Stack;
 
 public class SeamCarver {
-	private static final boolean X = true;
+	private static final boolean VERTICAL = true;
+	private static final boolean HORIZONTAL = false;
 	private Picture currentPic;
 	private double[][] energies;
 	private double[][] distTo;
@@ -31,12 +32,12 @@ public class SeamCarver {
 		validCoordinate(x, y);
 		if (x == 0 || x == width() - 1 || y == 0 || y == height() - 1)
 			return 1000;
-		return Math.sqrt(gradient(x, y, X) + gradient(x, y, !X));
+		return Math.sqrt(gradient(x, y, VERTICAL) + gradient(x, y, HORIZONTAL));
 	}
 
 	private double gradient(int x, int y, boolean gradientX) {
 		Color next, prev;
-		if (gradientX == X) {
+		if (gradientX == VERTICAL) {
 			next = picture().get(x + 1, y);
 			prev = picture().get(x - 1, y);
 		} else {
@@ -62,15 +63,15 @@ public class SeamCarver {
 				}
 				if(isValid(x-1, y-1) && distTo[x][y] > distTo[x-1][y-1] + energies[x][y]){
 					distTo[x][y] = distTo[x-1][y-1] + energies[x][y];
-					edgeTo[x][y] = new Position(x-1, y);
+					edgeTo[x][y] = new Position(x-1, y-1);
 				}
 				if(isValid(x, y-1) && distTo[x][y] > distTo[x][y-1] + energies[x][y]){
 					distTo[x][y] = distTo[x][y-1] + energies[x][y];
-					edgeTo[x][y] = new Position(x, y);
+					edgeTo[x][y] = new Position(x, y-1);
 				}
 				if(isValid(x+1, y-1) && distTo[x][y] > distTo[x+1][y-1] + energies[x][y]){
 					distTo[x][y] = distTo[x+1][y-1] + energies[x][y];
-					edgeTo[x][y] = new Position(x+1, y);
+					edgeTo[x][y] = new Position(x+1, y-1);
 				}
 			}
 		}
