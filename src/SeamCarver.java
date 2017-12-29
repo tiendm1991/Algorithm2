@@ -14,10 +14,29 @@ public class SeamCarver {
 	public SeamCarver(Picture picture) { // create a seam carver object based on
 											// the given picture
 		this.currentPic = picture;
+		initEnergy();
+	}
+	
+	private void initEnergy() {
+		energies = new double[width()][height()];
+		for(int i = 0; i < height(); i++){
+			for(int j = 0; j < width(); j++){
+				energies[j][i] = energy(j, i);
+			}
+		}
+	}
+	
+	private void reset() {
+		for(int i = 0; i < height(); i++){
+			for(int j = 0; j < width(); j++){
+				edgeTo[j][i] = new Position(-1, -1);
+				distTo[j][i] = Double.POSITIVE_INFINITY;
+			}
+		}
 	}
 
 	public Picture picture() { // current picture
-		return new Picture(currentPic);
+		return currentPic;
 	}
 
 	public int width() { // width of current picture
@@ -51,10 +70,9 @@ public class SeamCarver {
 	}
 
 	public int[] findVerticalSeam() { // sequence of indices for vertical seam
-		energies = new double[width()][height()];
 		distTo = new double[width()][height()];
 		edgeTo = new Position[width()][height()];
-		init();
+		reset();
 		for(int y = 0; y < height(); y++){
 			for(int x = 0; x < width(); x++){
 				if(y == 0) {
@@ -95,7 +113,9 @@ public class SeamCarver {
 			path.push(x);
 			current = edgeTo[x][y];
 		} while (current.y > 0);
-		path.push(current.x);
+		if(current.x >= 0){
+			path.push(current.x);
+		}
 		int[] result = new int[height()];
 		int count = 0;
 		while (!path.isEmpty()) {
@@ -104,20 +124,10 @@ public class SeamCarver {
 		return result;
 	}
 	
-	private void init() {
-		for(int i = 0; i < height(); i++){
-			for(int j = 0; j < width(); j++){
-				energies[j][i] = energy(j, i);
-				distTo[j][i] = Double.POSITIVE_INFINITY;
-			}
-		}
-	}
-	
 	public int[] findHorizontalSeam() { // sequence of indices for horizontal seam
-		energies = new double[width()][height()];
 		distTo = new double[width()][height()];
 		edgeTo = new Position[width()][height()];
-		init();
+		reset();
 		for(int x = 0; x < width(); x++){
 			for(int y = 0; y < height(); y++){
 				if(x == 0) {
@@ -158,8 +168,10 @@ public class SeamCarver {
 			path.push(y);
 			current = edgeTo[x][y];
 		} while (current.x > 0);
-		path.push(current.y);
-		int[] result = new int[height()];
+		if(current.y >= 0){
+			path.push(current.y);
+		}
+		int[] result = new int[width()];
 		int count = 0;
 		while (!path.isEmpty()) {
 			result[count++] = path.pop();
@@ -169,21 +181,57 @@ public class SeamCarver {
 	
 	public void removeHorizontalSeam(int[] seam) { // remove horizontal seam
 													// from current picture
-		if (seam == null || seam.length <= 0 || height() <= 1)
+		if (seam == null || seam.length <= 0 || height() <= 1 || seam.length != width()){
 			throw new IllegalArgumentException();
+		}
+		int prev = seam[0];
+		Picture newPic = new Picture(width(), height()-1);
+		for(int x = 0; x < width(); x++){
+			if(seam[x] < 0 || seam[x] >= height()) throw new IllegalArgumentException();
+			if(seam[x] < prev-1 || seam[x] > prev+1) throw new IllegalArgumentException();
+			prev = seam[x];
+			for(int y = 0; y < height()-1; y++){
+				if(y < prev) {
+					newPic.set(x, y, currentPic.get(x, y));
+				}else{
+					newPic.set(x, y, currentPic.get(x, y+1));
+				}
+			}
+		}
+		currentPic = newPic;
+		distTo = null;
+		edgeTo = null;
 	}
 
 	public void removeVerticalSeam(int[] seam) { // remove vertical seam from
 													// current picture
-		if (seam == null || seam.length <= 0 || width() <= 1)
+		if (seam == null || seam.length <= 0 || width() <= 1 || seam.length != height()){
 			throw new IllegalArgumentException();
+		}
+		int prev = seam[0];
+		Picture newPic = new Picture(width()-1, height());
+		for(int y = 0; y < height(); y++){
+			if(seam[y] < 0 || seam[y] >= width()) throw new IllegalArgumentException();
+			if(seam[y] < prev-1 || seam[y] > prev+1) throw new IllegalArgumentException();
+			prev = seam[y];
+			for(int x = 0; x < width()-1; x++){
+				if(x < prev) {
+					newPic.set(x, y, currentPic.get(x, y));
+				}else{
+					newPic.set(x, y, currentPic.get(x+1, y));
+				}
+			}
+		}
+		currentPic = newPic;
+		distTo = null;
+		edgeTo = null;
 	}
 	
 
 	private void validCoordinate(int x, int y) {
 		if (x < 0 || x >= width())
 			throw new IllegalArgumentException();
-		if (y < 0 || x >= height())
+		if (y < 0 || y >= height())
 			throw new IllegalArgumentException();
 	}
 	

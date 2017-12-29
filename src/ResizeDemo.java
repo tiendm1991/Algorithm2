@@ -20,8 +20,8 @@ public class ResizeDemo {
             StdOut.println("Usage:\njava ResizeDemo [image filename] [num cols to remove] [num rows to remove]");
             return;
         }
-
-        Picture inputImg = new Picture(args[0]);
+        
+        Picture inputImg = new Picture("6x5.png");
         int removeColumns = Integer.parseInt(args[1]);
         int removeRows = Integer.parseInt(args[2]); 
 

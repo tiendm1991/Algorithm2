@@ -30,7 +30,7 @@ public class ShowSeams {
     }
 
     public static void main(String[] args) {
-        Picture picture = new Picture(args[0]);
+        Picture picture = new Picture("6x5.png");
         StdOut.printf("image is %d columns by %d rows\n", picture.width(), picture.height());
         picture.show();        
         SeamCarver sc = new SeamCarver(picture);
