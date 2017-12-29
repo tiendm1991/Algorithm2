@@ -13,6 +13,7 @@ public class SeamCarver {
 	private Position[][] edgeTo;
 	public SeamCarver(Picture picture) { // create a seam carver object based on
 											// the given picture
+		if(picture == null) throw new IllegalArgumentException();;
 		this.currentPic = picture;
 		initEnergy();
 	}
@@ -36,15 +37,15 @@ public class SeamCarver {
 	}
 
 	public Picture picture() { // current picture
-		return currentPic;
+		return new Picture(currentPic);
 	}
 
 	public int width() { // width of current picture
-		return picture().width();
+		return currentPic.width();
 	}
 
 	public int height() { // height of current picture
-		return picture().height();
+		return currentPic.height();
 	}
 
 	public double energy(int x, int y) { // energy of pixel at column x and row y
@@ -57,16 +58,23 @@ public class SeamCarver {
 	private double gradient(int x, int y, boolean gradientX) {
 		Color next, prev;
 		if (gradientX == VERTICAL) {
-			next = picture().get(x + 1, y);
-			prev = picture().get(x - 1, y);
+			next = currentPic.get(x + 1, y);
+			prev = currentPic.get(x - 1, y);
 		} else {
-			next = picture().get(x, y + 1);
-			prev = picture().get(x, y - 1);
+			next = currentPic.get(x, y + 1);
+			prev = currentPic.get(x, y - 1);
 		}
 		int r = next.getRed() - prev.getRed();
 		int g = next.getGreen() - prev.getGreen();
 		int b = next.getBlue() - prev.getBlue();
 		return r * r + g * g + b * b;
+	}
+	
+	private void relaxXY(int x1, int y1, int x, int y) {
+		if(isValid(x1, y1) && distTo[x][y] > distTo[x1][y1] + energies[x][y]){
+			distTo[x][y] = distTo[x1][y1] + energies[x][y];
+			edgeTo[x][y] = new Position(x1, y1);
+		}
 	}
 
 	public int[] findVerticalSeam() { // sequence of indices for vertical seam
@@ -77,20 +85,12 @@ public class SeamCarver {
 			for(int x = 0; x < width(); x++){
 				if(y == 0) {
 					distTo[x][y] = energies[x][y];
+					edgeTo[x][y] = new Position(-1, -1);
 					continue;
 				}
-				if(isValid(x-1, y-1) && distTo[x][y] > distTo[x-1][y-1] + energies[x][y]){
-					distTo[x][y] = distTo[x-1][y-1] + energies[x][y];
-					edgeTo[x][y] = new Position(x-1, y-1);
-				}
-				if(isValid(x, y-1) && distTo[x][y] > distTo[x][y-1] + energies[x][y]){
-					distTo[x][y] = distTo[x][y-1] + energies[x][y];
-					edgeTo[x][y] = new Position(x, y-1);
-				}
-				if(isValid(x+1, y-1) && distTo[x][y] > distTo[x+1][y-1] + energies[x][y]){
-					distTo[x][y] = distTo[x+1][y-1] + energies[x][y];
-					edgeTo[x][y] = new Position(x+1, y-1);
-				}
+				relaxXY(x-1,y-1,x,y);
+				relaxXY(x,y-1,x,y);
+				relaxXY(x+1,y-1,x,y);
 			}
 		}
 		double minPath = Double.POSITIVE_INFINITY;
@@ -112,10 +112,7 @@ public class SeamCarver {
 			int y = current.y;
 			path.push(x);
 			current = edgeTo[x][y];
-		} while (current.y > 0);
-		if(current.x >= 0){
-			path.push(current.x);
-		}
+		} while (current.y > -1);
 		int[] result = new int[height()];
 		int count = 0;
 		while (!path.isEmpty()) {
@@ -132,20 +129,12 @@ public class SeamCarver {
 			for(int y = 0; y < height(); y++){
 				if(x == 0) {
 					distTo[x][y] = energies[x][y];
+					edgeTo[x][y] = new Position(-1, -1);
 					continue;
 				}
-				if(isValid(x-1, y-1) && distTo[x][y] > distTo[x-1][y-1] + energies[x][y]){
-					distTo[x][y] = distTo[x-1][y-1] + energies[x][y];
-					edgeTo[x][y] = new Position(x-1, y-1);
-				}
-				if(isValid(x-1, y) && distTo[x][y] > distTo[x-1][y] + energies[x][y]){
-					distTo[x][y] = distTo[x-1][y] + energies[x][y];
-					edgeTo[x][y] = new Position(x-1, y);
-				}
-				if(isValid(x-1, y+1) && distTo[x][y] > distTo[x-1][y+1] + energies[x][y]){
-					distTo[x][y] = distTo[x-1][y+1] + energies[x][y];
-					edgeTo[x][y] = new Position(x-1, y+1);
-				}
+				relaxXY(x-1,y-1,x,y);
+				relaxXY(x-1,y,x,y);
+				relaxXY(x-1,y+1,x,y);
 			}
 		}
 		double minPath = Double.POSITIVE_INFINITY;
@@ -167,10 +156,7 @@ public class SeamCarver {
 			int y = current.y;
 			path.push(y);
 			current = edgeTo[x][y];
-		} while (current.x > 0);
-		if(current.y >= 0){
-			path.push(current.y);
-		}
+		} while (current.x > -1);
 		int[] result = new int[width()];
 		int count = 0;
 		while (!path.isEmpty()) {

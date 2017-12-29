@@ -16,14 +16,14 @@ import edu.princeton.cs.algs4.Stopwatch;
 
 public class ResizeDemo {
     public static void main(String[] args) {
-        if (args.length != 3) {
-            StdOut.println("Usage:\njava ResizeDemo [image filename] [num cols to remove] [num rows to remove]");
-            return;
-        }
+//        if (args.length != 3) {
+//            StdOut.println("Usage:\njava ResizeDemo [image filename] [num cols to remove] [num rows to remove]");
+//            return;
+//        }
         
-        Picture inputImg = new Picture("6x5.png");
-        int removeColumns = Integer.parseInt(args[1]);
-        int removeRows = Integer.parseInt(args[2]); 
+        Picture inputImg = new Picture("HJocean.png");
+        int removeColumns = Integer.parseInt("50");
+        int removeRows = Integer.parseInt("20"); 
 
         StdOut.printf("image is %d columns by %d rows\n", inputImg.width(), inputImg.height());
         SeamCarver sc = new SeamCarver(inputImg);
