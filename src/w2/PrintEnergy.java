@@ -1,3 +1,4 @@
+package w2;
 /******************************************************************************
  *  Compilation:  javac PrintEnergy.java
  *  Execution:    java PrintEnergy input.png

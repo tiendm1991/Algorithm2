@@ -1,3 +1,4 @@
+package w2;
 /******************************************************************************
  *  Compilation:  javac PrintSeams.java
  *  Execution:    java PrintSeams input.png

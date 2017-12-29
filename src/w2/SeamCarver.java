@@ -1,3 +1,4 @@
+package w2;
 
 import java.awt.Color;
 

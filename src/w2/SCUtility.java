@@ -1,3 +1,4 @@
+package w2;
 /******************************************************************************
  *  Compilation:  javac SCUtility.java
  *  Execution:    none

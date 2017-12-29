@@ -1,3 +1,4 @@
+package w2;
 /******************************************************************************
  *  Compilation:  javac ShowEnergy.java
  *  Execution:    java ShowEnergy input.png

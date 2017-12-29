@@ -1,3 +1,4 @@
+package w2;
 /******************************************************************************
  *  Compilation:  javac ShowSeams.java
  *  Execution:    java ShowSeams input.png
