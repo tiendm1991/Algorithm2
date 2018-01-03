@@ -14,7 +14,7 @@ public class SeamCarver {
 	private Position[][] edgeTo;
 	public SeamCarver(Picture picture) { // create a seam carver object based on
 											// the given picture
-		if(picture == null) throw new IllegalArgumentException();;
+		if(picture == null) throw new IllegalArgumentException();
 		this.currentPic = new Picture(picture);
 		initEnergy();
 	}
