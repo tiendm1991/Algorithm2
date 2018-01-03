@@ -1,7 +1,13 @@
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
+import edu.princeton.cs.algs4.FlowEdge;
+import edu.princeton.cs.algs4.FlowNetwork;
+import edu.princeton.cs.algs4.FordFulkerson;
 import edu.princeton.cs.algs4.In;
+import edu.princeton.cs.algs4.StdOut;
 
 public class BaseballElimination {
 	private final int N;
@@ -10,7 +16,7 @@ public class BaseballElimination {
 	private int[] remains;
 	private int[][] games;
 	private Map<String, Integer> mapTeam;
-
+	
 	public BaseballElimination(String filename) {
 		if (filename == null)
 			throw new IllegalArgumentException();
@@ -73,23 +79,95 @@ public class BaseballElimination {
 		if (!mapTeam.containsKey(team)) {
 			throw new IllegalArgumentException("The team is not exist");
 		}
-		if(isTrivialElimination(mapTeam.get(team))){
+		int id = mapTeam.get(team);
+		if(!getTrivialElimination(team).trim().equals("")){
 			return true;
+		}
+		FlowNetwork fn = createNetwork(id);
+		for(FlowEdge edge : fn.adj(id)){
+			if(edge.flow() > 0) return true;
 		}
 		return false;
 	}
 
-	private boolean isTrivialElimination(Integer idTeam) {
-		for(int i = 0; i < N; i++){
-			if(idTeam == i) continue;
+	private String getTrivialElimination(String team) {
+		int idTeam = mapTeam.get(team);
+		for(String strTeam : teams()){
+			Integer i = mapTeam.get(strTeam);
+			if(i == idTeam) continue;
 			if(wins[idTeam] + remains[idTeam] < wins[i]){
-				return true;
+				return strTeam;
 			}
 		}
-		return false;
+		return "";
+	}
+	
+	private FlowNetwork createNetwork(int id) {
+		int s = N;
+		int t = N+1;
+		int newNode = N+2;
+		Set<FlowEdge> edges = new HashSet<>();
+		for(int i = 0; i < N-1; i++){
+			if(i == id || wins[id] + remains[id] <= wins[i]) continue;
+			for(int j = i+1; j < N; j++){
+				if(j == id || games[i][j] == 0 ) continue;
+				edges.add(new FlowEdge(s, newNode, games[i][j]));
+				edges.add(new FlowEdge(newNode, i, Double.POSITIVE_INFINITY));
+				edges.add(new FlowEdge(newNode, j, Double.POSITIVE_INFINITY));
+				newNode++;
+			}
+			edges.add(new FlowEdge(i, t, wins[id] + remains[id] - wins[i]));
+		}
+		FlowNetwork fn = new FlowNetwork(newNode);
+		for(FlowEdge e : edges){
+			fn.addEdge(e);
+		}
+		return fn;
 	}
 
 	public Iterable<String> certificateOfElimination(String team) {
-
+		if (!mapTeam.containsKey(team)) {
+			throw new IllegalArgumentException("The team is not exist");
+		}
+		int v = mapTeam.get(team);
+		Set<String> eliminations = new HashSet<>();
+		String trivial = getTrivialElimination(team);
+		if(!trivial.equals("")){
+			eliminations.add(trivial);
+			return eliminations;
+		}
+		FlowNetwork fn = createNetwork(v);
+		int s = N, t = N+1;
+		FordFulkerson ffk = new FordFulkerson(fn, s, t);
+		for(FlowEdge e : fn.adj(v)){
+			if(e.flow() < e.capacity()){
+				for(String teamCheck : teams()){
+					int id = mapTeam.get(teamCheck);
+					if(ffk.inCut(id)){
+						eliminations.add(teamCheck);
+					}
+				}
+			}
+		}
+		if(eliminations.isEmpty()){
+			return null;
+		}
+		return eliminations;
+	}
+	
+	public static void main(String[] args) {
+	    BaseballElimination division = new BaseballElimination("teams4.txt");
+	    for (String team : division.teams()) {
+	        if (division.isEliminated(team)) {
+	            StdOut.print(team + " is eliminated by the subset R = { ");
+	            for (String t : division.certificateOfElimination(team)) {
+	                StdOut.print(t + " ");
+	            }
+	            StdOut.println("}");
+	        }
+	        else {
+	            StdOut.println(team + " is not eliminated");
+	        }
+	    }
 	}
 }
