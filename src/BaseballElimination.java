@@ -1,7 +1,6 @@
 import java.util.HashMap;
 import java.util.Map;
 
-import edu.princeton.cs.algs4.Bag;
 import edu.princeton.cs.algs4.In;
 
 public class BaseballElimination {
@@ -44,34 +43,50 @@ public class BaseballElimination {
 
 	public int wins(String team) {
 		if (!mapTeam.containsKey(team)) {
-			throw new IllegalArgumentException("The team is not known! Please specify a valid team name!");
+			throw new IllegalArgumentException("The team is not exist");
 		}
 		return wins[mapTeam.get(team)];
 	}
 
 	public int losses(String team) {
 		if (!mapTeam.containsKey(team)) {
-			throw new IllegalArgumentException("The team is not known! Please specify a valid team name!");
+			throw new IllegalArgumentException("The team is not exist");
 		}
 		return losses[mapTeam.get(team)];
 	}
 
 	public int remaining(String team) {
 		if (!mapTeam.containsKey(team)) {
-			throw new IllegalArgumentException("The team is not known! Please specify a valid team name!");
+			throw new IllegalArgumentException("The team is not exist");
 		}
 		return remains[mapTeam.get(team)];
 	}
 
 	public int against(String team1, String team2) {
 		if (!mapTeam.containsKey(team1) || !mapTeam.containsKey(team2)) {
-			throw new IllegalArgumentException("The team is not known! Please specify a valid team name!");
+			throw new IllegalArgumentException("The team is not exist");
 		}
 		return games[mapTeam.get(team1)][mapTeam.get(team2)];
 	}
 
 	public boolean isEliminated(String team) {
+		if (!mapTeam.containsKey(team)) {
+			throw new IllegalArgumentException("The team is not exist");
+		}
+		if(isTrivialElimination(mapTeam.get(team))){
+			return true;
+		}
+		return false;
+	}
 
+	private boolean isTrivialElimination(Integer idTeam) {
+		for(int i = 0; i < N; i++){
+			if(idTeam == i) continue;
+			if(wins[idTeam] + remains[idTeam] < wins[i]){
+				return true;
+			}
+		}
+		return false;
 	}
 
 	public Iterable<String> certificateOfElimination(String team) {
