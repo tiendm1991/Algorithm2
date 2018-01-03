@@ -84,8 +84,11 @@ public class BaseballElimination {
 			return true;
 		}
 		FlowNetwork fn = createNetwork(id);
-		for(FlowEdge edge : fn.adj(id)){
-			if(edge.flow() > 0) return true;
+		int s = N;
+		int t = N+1;
+		FordFulkerson ffk = new FordFulkerson(fn, s, t);
+		for(FlowEdge edge : fn.adj(s)){
+			if(edge.flow() < edge.capacity()) return true;
 		}
 		return false;
 	}
@@ -107,10 +110,14 @@ public class BaseballElimination {
 		int t = N+1;
 		int newNode = N+2;
 		Set<FlowEdge> edges = new HashSet<>();
+		int maxWin = Integer.MIN_VALUE;
+		for(int i = 0; i < N; i++){
+			if(wins[i] > maxWin) maxWin = wins[i];
+		}
 		for(int i = 0; i < N-1; i++){
-			if(i == id || wins[id] + remains[id] <= wins[i]) continue;
+			if(i == id || wins[i] + remains[i] < maxWin || wins[id] + remains[id] < wins[i]) continue;
 			for(int j = i+1; j < N; j++){
-				if(j == id || games[i][j] == 0 ) continue;
+				if(j == id || games[i][j] == 0 || wins[j] + remains[j] < maxWin) continue;
 				edges.add(new FlowEdge(s, newNode, games[i][j]));
 				edges.add(new FlowEdge(newNode, i, Double.POSITIVE_INFINITY));
 				edges.add(new FlowEdge(newNode, j, Double.POSITIVE_INFINITY));
@@ -139,7 +146,7 @@ public class BaseballElimination {
 		FlowNetwork fn = createNetwork(v);
 		int s = N, t = N+1;
 		FordFulkerson ffk = new FordFulkerson(fn, s, t);
-		for(FlowEdge e : fn.adj(v)){
+		for(FlowEdge e : fn.adj(s)){
 			if(e.flow() < e.capacity()){
 				for(String teamCheck : teams()){
 					int id = mapTeam.get(teamCheck);
