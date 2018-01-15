@@ -1,23 +1,21 @@
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 
 import edu.princeton.cs.algs4.In;
 import edu.princeton.cs.algs4.StdOut;
-import edu.princeton.cs.algs4.TrieSET;
 
 public class BoggleSolver {
 	// Initializes the data structure using the given array of strings as the
 	// dictionary.
 	// (You can assume each word in the dictionary contains only the uppercase
 	// letters A through Z.)
-	private TrieSET _dictSet;
+	private MyTrieSet _dictSet;
 	private boolean visited[][];
 
 	public BoggleSolver(String[] dictionary) {
 		if (dictionary == null)
 			throw new IllegalArgumentException();
-		_dictSet = new TrieSET();
+		_dictSet = new MyTrieSet();
 		for (String s : dictionary) {
 			_dictSet.add(s);
 		}
@@ -28,10 +26,10 @@ public class BoggleSolver {
 	public Iterable<String> getAllValidWords(BoggleBoard board) {
 		int r = board.rows();
 		int c = board.cols();
-		visited = new boolean[r][c];
 		Set<String> validWordsSet = new HashSet<>();
 		for (int i = 0; i < r; i++) {
 			for (int j = 0; j < c; j++) {
+				visited = new boolean[r][c];
 				getValidWordAtPosition(board, i, j, "", validWordsSet);
 			}
 		}
@@ -39,37 +37,43 @@ public class BoggleSolver {
 	}
 
 	private void getValidWordAtPosition(BoggleBoard board, int r, int c, String prefix, Set<String> validWordsSet) {
-		if (r < 0 || r >= board.rows() || c < 0 || c >= board.cols() || visited[r][c]) return;
+		if (visited[r][c]) return;
 		char charCur = board.getLetter(r, c);
 		if (charCur == 'Q') {
-			prefix += "Qu";
+			prefix += "QU";
 		} else {
 			prefix += charCur;
 		}
-		if (_dictSet.contains(prefix) && prefix.length() >=3){
+		if (prefix.length() >= 3 && _dictSet.contains(prefix)){
 			validWordsSet.add(prefix);
 		}
-		if (checkContainPrefix(prefix)) {
-			getValidWordAtPosition(board, r - 1, c - 1, prefix, validWordsSet);
-			getValidWordAtPosition(board, r - 1, c, prefix, validWordsSet);
-			getValidWordAtPosition(board, r - 1, c + 1, prefix, validWordsSet);
-			getValidWordAtPosition(board, r, c + 1, prefix, validWordsSet);
-			getValidWordAtPosition(board, r + 1, c + 1, prefix, validWordsSet);
-			getValidWordAtPosition(board, r + 1, c, prefix, validWordsSet);
-			getValidWordAtPosition(board, r + 1, c - 1, prefix, validWordsSet);
-			getValidWordAtPosition(board, r, c - 1, prefix, validWordsSet);
+		visited[r][c] = true;
+		if (_dictSet.hasKeysWithPrefix(prefix)) {
+			for(int i = -1; i <= 1; i++){
+				for(int j = -1; j <= 1; j++){
+					if(i ==0 && j == 0) continue;
+					if(isValid(r+i, c+j, board.rows(), board.cols())){
+						getValidWordAtPosition(board, r + i, c + j, prefix, validWordsSet);
+					}
+				}
+			}
 		}
+		visited[r][c] = false;
+	}
+	
+	private boolean isValid(int r, int c, int nbRow, int nbCol){
+		return r >= 0 && r < nbRow && c >= 0 && c < nbCol;
 	}
 
-	private boolean checkContainPrefix(String prefix) {
-		Iterable<String> keyWithPrefix = _dictSet.keysWithPrefix(prefix);
-		if (keyWithPrefix == null)
-			return false;
-		for (Iterator<String> it = keyWithPrefix.iterator(); it.hasNext();) {
-			return true;
-		}
-		return false;
-	}
+//	private boolean checkContainPrefix(String prefix) {
+//		Iterable<String> keyWithPrefix = _dictSet.keysWithPrefix(prefix);
+//		if (keyWithPrefix == null)
+//			return false;
+//		for (Iterator<String> it = keyWithPrefix.iterator(); it.hasNext();) {
+//			return true;
+//		}
+//		return false;
+//	}
 
 	// Returns the score of the given word if it is in the dictionary, zero
 	// otherwise.
@@ -91,8 +95,8 @@ public class BoggleSolver {
 	}
 
 	public static void main(String[] args) {
-		String dictFile = "dictionary-algs4.txt";
-		String boardFile = "board4x4.txt";
+		String dictFile = "dictionary-yawl.txt";
+		String boardFile = "board-qwerty.txt";
 		
 		In in = new In(dictFile);
 		String[] dictionary = in.readAllStrings();
