@@ -30,25 +30,13 @@ public class BoggleSolver {
 		int r = board.rows();
 		int c = board.cols();
 		Set<String> validWordsSet = new HashSet<>();
-		if(visited == null){
-			visited = new boolean[r][c];
-		}else {
-			clearVisited();
-		}
+		visited = new boolean[r][c];
 		for (int i = 0; i < r; i++) {
 			for (int j = 0; j < c; j++) {
 				getValidWordAtPosition(board, i, j, "", validWordsSet);
 			}
 		}
 		return validWordsSet;
-	}
-
-	private void clearVisited() {
-		for(int i = 0; i < visited.length; i++){
-			for(int j = 0; j < visited[0].length; j++){
-				visited[i][j] = false;
-			}
-		}
 	}
 
 	private void getValidWordAtPosition(BoggleBoard board, int r, int c, String prefix, Set<String> validWordsSet) {
@@ -76,15 +64,6 @@ public class BoggleSolver {
 		visited[r][c] = false;
 	}
 	
-//	private boolean checkContainPrefix(String prefix) {
-//		Iterable<String> keyWithPrefix = _dictSet.keysWithPrefix(prefix);
-//		if (keyWithPrefix == null)
-//			return false;
-//		for (Iterator<String> it = keyWithPrefix.iterator(); it.hasNext();) {
-//			return true;
-//		}
-//		return false;
-//	}
 
 	// Returns the score of the given word if it is in the dictionary, zero
 	// otherwise.
