@@ -64,7 +64,7 @@ public class BoggleSolver {
 	}
 	
 
-	// Returns the score of the given word if it is in the dictionary, zero
+	// Returns the score of the given word if it  is in the dictionary, zero
 	// otherwise.
 	// (You can assume the word contains only the uppercase letters A through
 	// Z.)
