@@ -41,7 +41,7 @@ import edu.princeton.cs.algs4.TrieSET;
  * @author Kevin Wayne
  */
 public class MyTrieSet implements Iterable<String> {
-	private static final int R = 256; // extended ASCII
+	private static final int R = 26; // extended ASCII
 
 	private Node root; // root of trie
 	private int n; // number of keys in trie
@@ -84,7 +84,7 @@ public class MyTrieSet implements Iterable<String> {
 		if (d == key.length())
 			return x;
 		char c = key.charAt(d);
-		return get(x.next[c], key, d + 1);
+		return get(x.next[c-'A'], key, d + 1);
 	}
 
 	/**
@@ -110,7 +110,7 @@ public class MyTrieSet implements Iterable<String> {
 			x.isString = true;
 		} else {
 			char c = key.charAt(d);
-			x.next[c] = add(x.next[c], key, d + 1);
+			x.next[c-'A'] = add(x.next[c-'A'], key, d + 1);
 		}
 		return x;
 	}
@@ -164,15 +164,15 @@ public class MyTrieSet implements Iterable<String> {
 			return;
 		if (x.isString)
 			results.enqueue(prefix.toString());
-		for (char c = 0; c < R; c++) {
+		for (int c = 'A'; c < 'A'+R; c++) {
 			prefix.append(c);
-			collect(x.next[c], prefix, results);
+			collect(x.next[c-'A'], prefix, results);
 			prefix.deleteCharAt(prefix.length() - 1);
 		}
 	}
 
-	// TienDM
 	/**
+	 * TienDM
 	 * Returns true if exist least keys has prefix
 	 */
 	public boolean hasKeysWithPrefix(String prefix) {
@@ -195,9 +195,9 @@ public class MyTrieSet implements Iterable<String> {
 			return;
 		}
 		if (!hasPrefix) {
-			for (char c = 0; c < R; c++) {
+			for (int c = 'A'; c < R+'A'; c++) {
 				prefix.append(c);
-				checkCollect(x.next[c], prefix);
+				checkCollect(x.next[c-'A'], prefix);
 				prefix.deleteCharAt(prefix.length() - 1);
 			}
 		}
@@ -229,14 +229,14 @@ public class MyTrieSet implements Iterable<String> {
 			return;
 		char c = pattern.charAt(d);
 		if (c == '.') {
-			for (char ch = 0; ch < R; ch++) {
+			for (char ch = 'A'; ch < 'A'+R; ch++) {
 				prefix.append(ch);
-				collect(x.next[ch], prefix, pattern, results);
+				collect(x.next[ch-'A'], prefix, pattern, results);
 				prefix.deleteCharAt(prefix.length() - 1);
 			}
 		} else {
 			prefix.append(c);
-			collect(x.next[c], prefix, pattern, results);
+			collect(x.next[c-'A'], prefix, pattern, results);
 			prefix.deleteCharAt(prefix.length() - 1);
 		}
 	}
@@ -273,7 +273,7 @@ public class MyTrieSet implements Iterable<String> {
 		if (d == query.length())
 			return length;
 		char c = query.charAt(d);
-		return longestPrefixOf(x.next[c], query, d + 1, length);
+		return longestPrefixOf(x.next[c-'A'], query, d + 1, length);
 	}
 
 	/**
@@ -299,14 +299,14 @@ public class MyTrieSet implements Iterable<String> {
 			x.isString = false;
 		} else {
 			char c = key.charAt(d);
-			x.next[c] = delete(x.next[c], key, d + 1);
+			x.next[c-'A'] = delete(x.next[c-'A'], key, d + 1);
 		}
 
 		// remove subtrie rooted at x if it is completely empty
 		if (x.isString)
 			return x;
 		for (int c = 0; c < R; c++)
-			if (x.next[c] != null)
+			if (x.next[c-'A'] != null)
 				return x;
 		return null;
 	}

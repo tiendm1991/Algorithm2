@@ -16,8 +16,11 @@ public class BoggleSolver {
 		if (dictionary == null)
 			throw new IllegalArgumentException();
 		_dictSet = new MyTrieSet();
+		
 		for (String s : dictionary) {
-			_dictSet.add(s);
+			if(s.length() >= 3){
+				_dictSet.add(s);
+			}
 		}
 	}
 
@@ -27,44 +30,52 @@ public class BoggleSolver {
 		int r = board.rows();
 		int c = board.cols();
 		Set<String> validWordsSet = new HashSet<>();
+		if(visited == null){
+			visited = new boolean[r][c];
+		}else {
+			clearVisited();
+		}
 		for (int i = 0; i < r; i++) {
 			for (int j = 0; j < c; j++) {
-				visited = new boolean[r][c];
 				getValidWordAtPosition(board, i, j, "", validWordsSet);
 			}
 		}
 		return validWordsSet;
 	}
 
+	private void clearVisited() {
+		for(int i = 0; i < visited.length; i++){
+			for(int j = 0; j < visited[0].length; j++){
+				visited[i][j] = false;
+			}
+		}
+	}
+
 	private void getValidWordAtPosition(BoggleBoard board, int r, int c, String prefix, Set<String> validWordsSet) {
 		if (visited[r][c]) return;
 		char charCur = board.getLetter(r, c);
+		String word = prefix;
 		if (charCur == 'Q') {
-			prefix += "QU";
+			word += "QU";
 		} else {
-			prefix += charCur;
+			word += charCur;
 		}
-		if (prefix.length() >= 3 && _dictSet.contains(prefix)){
-			validWordsSet.add(prefix);
+		if (word.length() >= 3 && _dictSet.contains(word)){
+			validWordsSet.add(word);
 		}
 		visited[r][c] = true;
-		if (_dictSet.hasKeysWithPrefix(prefix)) {
-			for(int i = -1; i <= 1; i++){
-				for(int j = -1; j <= 1; j++){
-					if(i ==0 && j == 0) continue;
-					if(isValid(r+i, c+j, board.rows(), board.cols())){
-						getValidWordAtPosition(board, r + i, c + j, prefix, validWordsSet);
-					}
+		if (_dictSet.hasKeysWithPrefix(word)) {
+			for(int i = r-1; i <= r+1; i++){
+				if(i < 0 || i >= board.rows()) continue;
+				for(int j = c-1; j <= c+1; j++){
+					if(j < 0 || j >= board.cols() || (i == r && j == c))continue;
+					getValidWordAtPosition(board, i, j, word, validWordsSet);
 				}
 			}
 		}
 		visited[r][c] = false;
 	}
 	
-	private boolean isValid(int r, int c, int nbRow, int nbCol){
-		return r >= 0 && r < nbRow && c >= 0 && c < nbCol;
-	}
-
 //	private boolean checkContainPrefix(String prefix) {
 //		Iterable<String> keyWithPrefix = _dictSet.keysWithPrefix(prefix);
 //		if (keyWithPrefix == null)
@@ -95,8 +106,8 @@ public class BoggleSolver {
 	}
 
 	public static void main(String[] args) {
-		String dictFile = "dictionary-yawl.txt";
-		String boardFile = "board-qwerty.txt";
+		String dictFile = "dictionary-common.txt";
+		String boardFile = "board-test.txt";
 		
 		In in = new In(dictFile);
 		String[] dictionary = in.readAllStrings();
