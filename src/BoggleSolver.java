@@ -24,8 +24,7 @@ public class BoggleSolver {
 		}
 	}
 
-	// Returns the set of all valid words in the given Boggle board, as an
-	// Iterable.
+	// Returns the set of all valid words in the given Boggle board, as an Iterable.
 	public Iterable<String> getAllValidWords(BoggleBoard board) {
 		int r = board.rows();
 		int c = board.cols();
