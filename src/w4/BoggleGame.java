@@ -1,4 +1,4 @@
-package w5;
+package w4;
 /******************************************************************************
  *  Compilation:  javac BoggleGame.java
  *  Execution:    java BoggleGame [m n]
