@@ -16,6 +16,7 @@ public class CircularSuffixArray {
 		char[][] orgSuffix = new char[N][N];
 		for(int i = 0; i < N; i++){
 			orgSuffix[0][i] = orgString.charAt(i);
+			index[i] = i;
 		}
 		for(int i = 1; i < N; i++){
 			for(int j = 0; j < N; j++){
@@ -28,27 +29,25 @@ public class CircularSuffixArray {
 		}
 		System.out.println("org");
 		printsuffix(orgSuffix);
-		
-		char[][] sortSuffix = new char[N][N];
 		String[] sortStr = new String[N];
 		for(int i = 0; i < N; i++){
 			sortStr[i] = new String(orgSuffix[i]);
 		}
-		Arrays.sort(sortStr);
-		for(int i = 0; i < N; i++){
-			for(int j = 0; j < N; j++){
-				sortSuffix[i][j] = sortStr[i].charAt(j);
-			}
-		}
-		System.out.println("sort");
-		printsuffix(sortSuffix);
 		
-		for(int i = 0; i < N; i++){
-			int count = 0;
-			for(int j = 0; j < N; j++){
-				
+		for(int i = 0; i < N-1; i++){
+			for(int j = i+1; j < N; j++){
+				if(sortStr[index[i]].compareTo(sortStr[index[j]]) > 0) {
+					swapIdx(i, j); 
+				}
 			}
 		}
+		
+		System.out.println(Arrays.asList(index));
+	}
+	private void swapIdx(int i, int j){
+		int tmp = index[i];
+		index[i] = index[j];
+		index[j] = tmp;
 	}
 
 	public int length() { // length of s
