@@ -1,5 +1,7 @@
 
 public class BurrowsWheeler {
+	private CircularSuffixArray csa;
+	
 	 // apply Burrows-Wheeler transform, reading from standard input and writing to standard output
     public static void transform(){
     	
