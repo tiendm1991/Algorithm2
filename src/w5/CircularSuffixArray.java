@@ -1,3 +1,6 @@
+package w5;
+import java.util.Arrays;
+
 public class CircularSuffixArray {
 	
 	private String orgString;
@@ -24,6 +27,8 @@ public class CircularSuffixArray {
 				}
 			}
 		}
+		System.out.println("org");
+		printsuffix(orgSuffix);
 		String[] sortStr = new String[N];
 		for(int i = 0; i < N; i++){
 			sortStr[i] = new String(orgSuffix[i]);
@@ -36,6 +41,8 @@ public class CircularSuffixArray {
 				}
 			}
 		}
+		
+		System.out.println(Arrays.asList(index));
 	}
 	private void swapIdx(int i, int j){
 		int tmp = index[i];
