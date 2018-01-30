@@ -1,10 +1,11 @@
 
 import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.HashMap;
+import java.util.Map;
 
 import edu.princeton.cs.algs4.BinaryStdIn;
 import edu.princeton.cs.algs4.BinaryStdOut;
+import edu.princeton.cs.algs4.Queue;
 
 public class BurrowsWheeler {
 	
@@ -15,7 +16,7 @@ public class BurrowsWheeler {
     	CircularSuffixArray csa = new CircularSuffixArray(input);
     	for(int i = 0; i < N; i++){
     		if(csa.index(i) == 0) {
-    			BinaryStdOut.write((int)i);
+    			BinaryStdOut.write(i);
     		}
     	}
     	for(int i = 0; i < N; i++){
@@ -31,19 +32,20 @@ public class BurrowsWheeler {
          String chars = BinaryStdIn.readString();
          char[] arr = chars.toCharArray();
          int[] next = new int[arr.length];
-         boolean[] exist = new boolean[arr.length];
+         Map<Character, Integer> positions = new HashMap<Character, Integer>();
          Arrays.sort(arr);
          for(int i = 0; i < arr.length; i++){
-        	 for(int j = 0; j < arr.length; j++) {
+        	 Integer p = positions.get(arr[i]);
+        	 if(p == null) p = 0;
+        	 for(int j = p; j < arr.length; j++) {
         		 if(chars.charAt(j) == arr[i]) {
-        			 if(!exist[j]) {
         				 next[i] = j;
-        				 exist[j] = true;
+        				 positions.put(arr[i], j+1);
         				 break;
-        			 }
         		 }
         	 }
          }
+         
          for(int i = first, count = 0; count < arr.length; i = next[i]){
         	 BinaryStdOut.write(arr[i],8);
         	 count++;

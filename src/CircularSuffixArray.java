@@ -33,7 +33,7 @@ public class CircularSuffixArray {
 	}
 
 	public int index(int i) { // returns index of ith sorted suffix
-		if(i < 0 || i > N) throw new java.lang.IllegalArgumentException();
+		if(i < 0 || i >= N) throw new java.lang.IllegalArgumentException();
 		return index[i];
 	}
 	
