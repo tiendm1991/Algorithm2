@@ -29,25 +29,23 @@ public class BurrowsWheeler {
     public static void inverseTransform(){
     	 int first = BinaryStdIn.readInt();
          String chars = BinaryStdIn.readString();
-         char[] orgChar = chars.toCharArray();
-         char[] sortChar = chars.toCharArray();
-         int[] next = new int[orgChar.length];
-         Set<Integer> exist = new HashSet<>();
-         Arrays.sort(sortChar);
-         for(int i = 0; i < sortChar.length; i++){
-        	 for(int j = 0; j < orgChar.length; j++){
-        		 if(orgChar[j] == sortChar[i]) {
-        			 if(!exist.contains(j)){
-        				 exist.add(j);
+         char[] arr = chars.toCharArray();
+         int[] next = new int[arr.length];
+         boolean[] exist = new boolean[arr.length];
+         Arrays.sort(arr);
+         for(int i = 0; i < arr.length; i++){
+        	 for(int j = 0; j < arr.length; j++) {
+        		 if(chars.charAt(j) == arr[i]) {
+        			 if(!exist[j]) {
         				 next[i] = j;
+        				 exist[j] = true;
         				 break;
         			 }
         		 }
         	 }
          }
-         System.out.println(Arrays.asList(next));
-         for(int i = first, count = 0; count < next.length; i = next[i]){
-        	 BinaryStdOut.write(sortChar[i],8);
+         for(int i = first, count = 0; count < arr.length; i = next[i]){
+        	 BinaryStdOut.write(arr[i],8);
         	 count++;
          }
          BinaryStdOut.close();

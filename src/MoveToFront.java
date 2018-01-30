@@ -18,9 +18,9 @@ public class MoveToFront {
 			 int count = 0;
 			 for(Iterator<Character> it = moveToFront.iterator();it.hasNext(); ){
 				 Character curChar = it.next();
-				 if(curChar == c){
+				 if(curChar.equals(c)){
 					 BinaryStdOut.write(count,8);
-					 it.remove();
+					 moveToFront.remove(count);
 					 moveToFront.add(0, curChar);
 					 break;
 				 }
