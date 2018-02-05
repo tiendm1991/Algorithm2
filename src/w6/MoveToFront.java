@@ -1,3 +1,4 @@
+package w6;
 
 import java.util.Iterator;
 import java.util.LinkedList;
