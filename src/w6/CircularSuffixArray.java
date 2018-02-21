@@ -40,5 +40,8 @@ public class CircularSuffixArray {
 	
 	public static void main(String[] args) { // unit testing (required)
 		CircularSuffixArray x = new CircularSuffixArray("ABRACADABRA!");
+		int a = 10;
+		int b = ++a + ++a + ++a;
+		System.out.println(b);
 	}
 }
